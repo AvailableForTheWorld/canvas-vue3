@@ -1,50 +1,50 @@
 <template>
   <div class="menu">
-    <ul>
+    <ul @click="handleClick($event)" ref="menuUl">
       <li>
-        <el-icon >
+        <el-icon :color="activeIndex===1?'#fff':''">
           <Rank />
         </el-icon>
       </li>
-      <li>
-          <el-icon >
+      <li @click="handleSelectButton()">
+        <el-icon :color="activeIndex===2?'#fff':''">
           <Pointer />
         </el-icon>
       </li>
       <li>
-        <el-icon >
+        <el-icon :color="activeIndex===3?'#fff':''">
           <EditPen />
         </el-icon>
       </li>
       <li>
-        <el-icon >
+        <el-icon :color="activeIndex===4?'#fff':''">
           <Tickets />
         </el-icon>
       </li>
       
       <li>
-          <el-icon >
+          <el-icon :color="activeIndex===5?'#fff':''">
           <Delete />
         </el-icon>
       </li>
       <li>
-        <el-icon >
+        <el-icon :color="activeIndex===6?'#fff':''">
           <Crop />
         </el-icon>
       </li>
       <li>
-        <el-icon >
+        <el-icon :color="activeIndex===7?'#fff':''">
           <RefreshLeft />
         </el-icon>
       </li>
       <li>
-        <el-icon >
+        <el-icon :color="activeIndex===8?'#fff':''">
           <RefreshRight />
         </el-icon>
       </li>
       
       <li>
-          <el-icon >
+        <el-icon :color="activeIndex===9?'#fff':''">
           <FullScreen />
         </el-icon>
       </li>
@@ -54,7 +54,53 @@
 </template>
 
 <script lang="ts" setup>
+import { ref } from 'vue'
 import { Tickets, Crop, EditPen, Pointer, Delete, FullScreen, Rank, RefreshLeft, RefreshRight } from "@element-plus/icons-vue";
+import { useSelect } from '@/store/menu'
+import { storeToRefs } from 'pinia'
+
+const { isSelect } = storeToRefs(useSelect())
+
+
+const activeIndex = ref(0);
+const menuUl = ref(null)
+
+
+const handleSelectButton = ()=>{
+  isSelect.value = !isSelect.value;
+}
+
+const handleClick = (e)=>{
+  const parentNode = e.target.parentNode;
+  const selfNode = e.target;
+  const childNode = e.target.children[0];
+  const targetNode = ref(null);
+  if(parentNode?.tagName==='I'){
+    targetNode.value = parentNode;
+  }
+  else if(selfNode?.tagName === 'I'){
+    targetNode.value = selfNode;
+  }
+  else if(childNode?.tagName === 'I'){
+    targetNode.value = childNode;
+  }
+  
+  const childrenList = Array.from(menuUl.value.children)
+  childrenList.map((item,index)=>{
+    item.children[0].style.backgroundColor='transparent'
+    if(item.children[0]===targetNode.value){
+      if(isSelect.value){
+        activeIndex.value = 0;
+      }
+      else{
+        activeIndex.value = index+1;
+        item.children[0].style.backgroundColor='#666666'
+      }
+      
+    }
+  })
+}
+
 </script>
 <style lang="scss" scoped>
 .menu{
@@ -62,7 +108,6 @@ import { Tickets, Crop, EditPen, Pointer, Delete, FullScreen, Rank, RefreshLeft,
         background-color: #f5f5f5;
         display: flex;
         max-width: 1200px;
-        padding: 0 10px;
         margin: 0 auto;
         justify-content: center;
         align-items: center;
@@ -79,6 +124,12 @@ import { Tickets, Crop, EditPen, Pointer, Delete, FullScreen, Rank, RefreshLeft,
             display: flex;
             justify-content: center;
             align-items: center;
+            i{
+              display: block;
+              background-color: transparent;
+              padding: 7px;
+              border-radius: 50%;
+            }
         }
     }
 }

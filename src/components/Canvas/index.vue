@@ -2,32 +2,57 @@
 <div class="canvas-container" ref="container">
     <canvas id="canvas" ref="canvas" @click="showInput($event)" ></canvas>
     <input type="text" ref="Input" @keyup.enter="storeText()"/>
+    <div class="words-container" ref="wordsContainer"></div>
 </div>
 </template>
 
 <script setup>
-import { onMounted, ref, render } from 'vue'
+import { onMounted, ref, computed, watch } from 'vue'
+
+import { useSelect } from '@/store/menu'
+import { storeToRefs } from 'pinia'
+
+const { isSelect } = storeToRefs(useSelect())
+watch(isSelect,(cur,pre)=>{
+    if(cur){
+        console.log("isSelect.value is true")
+    }
+    else{
+        console.log("isSelect.value is false")
+    }
+    return cur
+})
+
 const canvas = ref(null)
 const context = ref(null)
 const devicePixelRatio = ref(0)
 const Input = ref(null)
 const container = ref(null)
+const wordsContainer = ref(null)
 const posX=ref(0),posY=ref(0);
+let isFocus = false;
 
 const showInput = (e)=>{
+    if(isFocus){
+        storeText();
+    }
     const {clientX,clientY}=e;
-    console.log(clientX,clientY)
+    handleInput(clientX,clientY)
+}
+
+const handleInput = (x,y)=>{
     Input.value.focus();
+    isFocus = true;
     Input.value.style=
-            `top:${clientY}px;
-            left:${clientX}px;`
-    posX.value=clientX;
-    posY.value=clientY;
+            `top:${y}px;
+            left:${x}px;`
+    posX.value=x;
+    posY.value=y;
 }
 
 const storeText = ()=>{
     const label1 = document.createElement('label');
-    label1.addEventListener('click',deleteLabel)
+    label1.addEventListener('click',editInput)
     label1.style=`
         position:absolute;
         top:${posY.value}px;
@@ -37,15 +62,24 @@ const storeText = ()=>{
     label1.innerText=Input.value.value;
     Input.value.value="";
     Input.value.blur();
-    console.log("label1",label1);
-    container.value.appendChild(label1);
+    isFocus=false;
+    wordsContainer.value.appendChild(label1);
 }
 
 const deleteLabel = (e)=>{
-    console.log("e.target",e.target)
     e.target.remove();
 }
 
+const editInput = (e)=>{
+    if(isFocus){
+        storeText();
+    }
+    const inputValue = e.target.innerText;
+    console.log('inputValue',e.target.style)
+    deleteLabel(e);
+    handleInput(parseInt(e.target.style.left),parseInt(e.target.style.top));
+    Input.value.value = inputValue;
+}
 
 onMounted(()=>{
     context.value = canvas.value.getContext('2d')
