@@ -13,15 +13,7 @@ import { useSelect } from '@/store/menu'
 import { storeToRefs } from 'pinia'
 
 const { isSelect } = storeToRefs(useSelect())
-watch(isSelect,(cur,pre)=>{
-    if(cur){
-        console.log("isSelect.value is true")
-    }
-    else{
-        console.log("isSelect.value is false")
-    }
-    return cur
-})
+
 
 const canvas = ref(null)
 const context = ref(null)
@@ -31,8 +23,12 @@ const container = ref(null)
 const wordsContainer = ref(null)
 const posX=ref(0),posY=ref(0);
 let isFocus = false;
+let isSelectWords = false;
 
 const showInput = (e)=>{
+    if(!isSelect.value.bool||isSelect.value.index!==4||isSelectWords){
+        return;
+    }
     if(isFocus){
         storeText();
     }
@@ -50,9 +46,30 @@ const handleInput = (x,y)=>{
     posY.value=y;
 }
 
+const handleWordsDown = (e)=>{
+    isSelectWords = true;
+    Input.value.blur();
+    posX.value = e.offsetX;
+    posY.value = e.offsetY;
+    e.target.addEventListener('mousemove',handleWordsMove);
+}
+
+const handleWordsMove = (e)=>{
+    e.target.style.top= `${e.clientY-posY.value}px`
+    e.target.style.left=`${e.clientX-posX.value}px`
+
+    e.target.addEventListener('mouseup',removeWordsMove);
+}
+
+const removeWordsMove = (e)=>{
+    isSelectWords = false;
+    e.target.removeEventListener('mousemove',handleWordsMove);
+}
+
 const storeText = ()=>{
     const label1 = document.createElement('label');
     label1.addEventListener('click',editInput)
+    label1.addEventListener('mousedown',handleWordsDown);
     label1.style=`
         position:absolute;
         top:${posY.value}px;
@@ -71,11 +88,18 @@ const deleteLabel = (e)=>{
 }
 
 const editInput = (e)=>{
+    if(isSelect.value.bool&&isSelect.value.index===5){
+        deleteLabel(e);
+        return;
+    }
+    else if(!isSelect.value.bool||isSelect.value.index!==2||isSelectWords){
+        return;
+    }
+
     if(isFocus){
         storeText();
     }
     const inputValue = e.target.innerText;
-    console.log('inputValue',e.target.style)
     deleteLabel(e);
     handleInput(parseInt(e.target.style.left),parseInt(e.target.style.top));
     Input.value.value = inputValue;
@@ -88,22 +112,8 @@ onMounted(()=>{
     context.value.height = context.value.height * 8;
     context.value.font = 12+'px 微软雅黑'
     // makeHighRes(context.value);
-    // console.log("the context is: ",context.value)
 })
 
-function makeHighRes(canvas) {
-    console.log("canvas",canvas)
-    
-}
-
-
-
-const addText = (e)=>{
-    console.log("event",e)
-
-    context.value.font = 16*devicePixelRatio.value+'px sans-serif';
-   
-}
 </script>
 
 <style lang="scss" scoped>

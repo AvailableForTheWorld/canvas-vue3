@@ -2,49 +2,49 @@
   <div class="menu">
     <ul @click="handleClick($event)" ref="menuUl">
       <li>
-        <el-icon :color="activeIndex===1?'#fff':''">
+        <el-icon :color="isSelect.index===1?'#fff':''">
           <Rank />
         </el-icon>
       </li>
-      <li @click="handleSelectButton()">
-        <el-icon :color="activeIndex===2?'#fff':''">
+      <li>
+        <el-icon :color="isSelect.index===2?'#fff':''">
           <Pointer />
         </el-icon>
       </li>
       <li>
-        <el-icon :color="activeIndex===3?'#fff':''">
+        <el-icon :color="isSelect.index===3?'#fff':''">
           <EditPen />
         </el-icon>
       </li>
       <li>
-        <el-icon :color="activeIndex===4?'#fff':''">
+        <el-icon :color="isSelect.index===4?'#fff':''">
           <Tickets />
         </el-icon>
       </li>
       
       <li>
-          <el-icon :color="activeIndex===5?'#fff':''">
+          <el-icon :color="isSelect.index===5?'#fff':''">
           <Delete />
         </el-icon>
       </li>
       <li>
-        <el-icon :color="activeIndex===6?'#fff':''">
+        <el-icon :color="isSelect.index===6?'#fff':''">
           <Crop />
         </el-icon>
       </li>
       <li>
-        <el-icon :color="activeIndex===7?'#fff':''">
+        <el-icon :color="isSelect.index===7?'#fff':''">
           <RefreshLeft />
         </el-icon>
       </li>
       <li>
-        <el-icon :color="activeIndex===8?'#fff':''">
+        <el-icon :color="isSelect.index===8?'#fff':''">
           <RefreshRight />
         </el-icon>
       </li>
       
       <li>
-        <el-icon :color="activeIndex===9?'#fff':''">
+        <el-icon :color="isSelect.index===9?'#fff':''">
           <FullScreen />
         </el-icon>
       </li>
@@ -62,13 +62,8 @@ import { storeToRefs } from 'pinia'
 const { isSelect } = storeToRefs(useSelect())
 
 
-const activeIndex = ref(0);
 const menuUl = ref(null)
 
-
-const handleSelectButton = ()=>{
-  isSelect.value = !isSelect.value;
-}
 
 const handleClick = (e)=>{
   const parentNode = e.target.parentNode;
@@ -84,17 +79,22 @@ const handleClick = (e)=>{
   else if(childNode?.tagName === 'I'){
     targetNode.value = childNode;
   }
-  
+  else if(parentNode?.tagName === 'svg'){
+    targetNode.value = parentNode.parentNode;
+  }
   const childrenList = Array.from(menuUl.value.children)
   childrenList.map((item,index)=>{
     item.children[0].style.backgroundColor='transparent'
     if(item.children[0]===targetNode.value){
-      if(isSelect.value){
-        activeIndex.value = 0;
+     
+      if(isSelect.value.bool && isSelect.value.index===index+1){
+        isSelect.value.bool = false;
+        isSelect.value.index = 0;
       }
       else{
-        activeIndex.value = index+1;
         item.children[0].style.backgroundColor='#666666'
+        isSelect.value.bool = true;
+        isSelect.value.index = index+1;
       }
       
     }
