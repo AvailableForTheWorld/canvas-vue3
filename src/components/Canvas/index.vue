@@ -1,6 +1,6 @@
 <template>
 <div class="canvas-container" ref="container">
-    <canvas id="canvas" ref="canvas" @click="showEdit($event)" ></canvas>
+    <canvas id="canvas" ref="canvas" @mousemove="showEdit($event)" ></canvas>
     <input type="text" ref="Input" @keyup.enter="storeText()"/>
     <div class="words-container" ref="wordsContainer"></div>
 </div>
@@ -28,7 +28,6 @@ let isSelectWords = false;
 
 
 const showEdit = (e)=>{
-    console.log("bool",isSelect.value.bool)
     if(isSelect.value.bool){
         if(isSelect.value.index===4){
             showInput(e);
@@ -41,23 +40,25 @@ const showEdit = (e)=>{
 
 const handleLineMove = (e)=>{
     e.target.addEventListener('mouseup',handleLineUp);
-
+    if(isSelect.value.index!==3){
+        e.target.removeEventListener('mouseup',handleLineUp);
+        context.value.closePath();
+        e.target.removeEventListener('mousemove',handleLineMove);
+    }
 }
 
 const handleLineUp = (e)=>{
     context.value.lineTo(e.clientX,e.clientY);
     context.value.strokeStyle = 'green';
-    context.value.lineWidth = 5;
+    context.value.lineWidth = 2;
     context.value.stroke();
     context.value.closePath();
     e.target.removeEventListener('mousemove',handleLineMove);
 }
 
 const showPaint = (e)=>{
-    console.log("e.client",e.clientX,e.clientY)
     context?.value?.beginPath();
     context.value.moveTo(e.clientX,e.clientY);
-    
     e.target.addEventListener('mousemove',handleLineMove)
 }
 
@@ -84,6 +85,10 @@ const handleInput = (x,y)=>{
 }
 
 const handleWordsDown = (e)=>{
+    if(isSelect.value.index!==1){
+        e.target.removeEventListener('mousedown',handleWordsDown);
+        return;
+    }
     isSelectWords = true;
     Input.value.blur();
     posX.value = e.offsetX;
@@ -94,7 +99,7 @@ const handleWordsDown = (e)=>{
 const handleWordsMove = (e)=>{
     e.target.style.top= `${e.clientY-posY.value}px`
     e.target.style.left=`${e.clientX-posX.value}px`
-
+    Input.value.blur();
     e.target.addEventListener('mouseup',removeWordsMove);
 }
 
@@ -147,9 +152,11 @@ onMounted(()=>{
     canvas.value.width = document.body.clientWidth;
     canvas.value.height = document.body.clientHeight;
     // console.log("context.value.width",context.value)
-    // devicePixelRatio.value = window.devicePixelRatio;
-    
-    context.value.font = 12+'px 微软雅黑'
+    devicePixelRatio.value = window.devicePixelRatio;
+    canvas.value.width *= devicePixelRatio.value;
+    canvas.value.height *= devicePixelRatio.value;
+
+    context.value.font = 12*devicePixelRatio.value+'px 微软雅黑'
     // makeHighRes(context.value);
 })
 

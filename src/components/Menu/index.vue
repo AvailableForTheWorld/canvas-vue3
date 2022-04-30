@@ -44,7 +44,7 @@
       </li>
       
       <li>
-        <el-icon :color="isSelect.index===9?'#fff':''">
+        <el-icon :color="isSelect.index===9?'#fff':''" @click="handleFullScreen()">
           <FullScreen />
         </el-icon>
       </li>
@@ -61,7 +61,7 @@ import { storeToRefs } from 'pinia'
 
 const { isSelect } = storeToRefs(useSelect())
 
-
+let isFullScreen = false;
 const menuUl = ref(null)
 
 
@@ -100,6 +100,47 @@ const handleClick = (e)=>{
     }
   })
 }
+
+const handleFullScreen = ()=>{
+  if(!isSelect.value.bool){
+    requestFullscreen();
+  }
+  else{
+    exitFullscreen();
+  }
+  
+}
+
+
+// 进入全屏
+const requestFullscreen = (el = null) => {
+    const ele = el || document.documentElement;
+    const rfs = ele.requestFullscreen || ele.webkitRequestFullscreen || ele.mozRequestFullScreen || ele.msRequestFullscreen;
+
+    // 如果全屏，返回
+    if (isSelect.value.bool) return;
+
+    if (rfs) {
+        rfs.call(ele);
+    } 
+};
+
+
+// 退出全屏
+const exitFullscreen = () => {
+    const ele = document;
+    const efs = ele.exitFullscreen || ele.webkitExitFullscreen || ele.mozCancelFullScreen;
+    // 如果不是全屏，返回
+    if (!isSelect.value.bool) return;
+
+    if (efs) {
+        efs.call(ele);
+    }
+};
+
+
+
+
 
 </script>
 <style lang="scss" scoped>
