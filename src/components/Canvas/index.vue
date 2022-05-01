@@ -1,180 +1,176 @@
 <template>
-<div class="canvas-container" ref="container">
-    <canvas id="canvas" ref="canvas" @mousemove="showEdit($event)" ></canvas>
-    <input type="text" ref="Input" @keyup.enter="storeText()"/>
+  <div class="canvas-container" ref="container">
+    <canvas id="canvas" ref="canvas" @mousemove="showEdit($event)"></canvas>
+    <input type="text" ref="Input" @keyup.enter="storeText()" />
     <div class="words-container" ref="wordsContainer"></div>
-</div>
+  </div>
 </template>
 
 <script setup>
-import { onMounted, ref, computed, watch } from 'vue'
+import { onMounted, ref, computed, watch } from "vue";
 
-import { useSelect } from '@/store/menu'
-import { storeToRefs } from 'pinia'
+import { useSelect } from "@/store/menu";
+import { storeToRefs } from "pinia";
 
-const { isSelect } = storeToRefs(useSelect())
+const { isSelect } = storeToRefs(useSelect());
 
-
-const canvas = ref(null)
-const context = ref(null)
-const devicePixelRatio = ref(0)
-const Input = ref(null)
-const container = ref(null)
-const wordsContainer = ref(null)
-const posX=ref(0),posY=ref(0);
+const canvas = ref(null);
+const context = ref(null);
+const devicePixelRatio = ref(0);
+const Input = ref(null);
+const container = ref(null);
+const wordsContainer = ref(null);
+const posX = ref(0),
+  posY = ref(0);
 let isFocus = false;
 let isSelectWords = false;
 
-
-
-const showEdit = (e)=>{
-    if(isSelect.value.bool){
-        if(isSelect.value.index===4){
-            showInput(e);
-        }
-        else if(isSelect.value.index===3){
-            showPaint(e);
-        }
+const showEdit = (e) => {
+  if (isSelect.value.bool) {
+    if (isSelect.value.index === 4) {
+      showInput(e);
+    } else if (isSelect.value.index === 3) {
+      showPaint(e);
     }
-}
+  }
+};
 
-const handleLineMove = (e)=>{
-    e.target.addEventListener('mouseup',handleLineUp);
-    if(isSelect.value.index!==3){
-        e.target.removeEventListener('mouseup',handleLineUp);
-        context.value.closePath();
-        e.target.removeEventListener('mousemove',handleLineMove);
-    }
-}
-
-const handleLineUp = (e)=>{
-    context.value.lineTo(e.clientX,e.clientY);
-    context.value.strokeStyle = 'green';
-    context.value.lineWidth = 2;
-    context.value.stroke();
+const handleLineMove = (e) => {
+  e.target.addEventListener("mouseup", handleLineUp);
+  if (isSelect.value.index !== 3) {
+    e.target.removeEventListener("mouseup", handleLineUp);
     context.value.closePath();
-    e.target.removeEventListener('mousemove',handleLineMove);
-}
+    e.target.removeEventListener("mousemove", handleLineMove);
+  }
+};
 
-const showPaint = (e)=>{
-    context?.value?.beginPath();
-    context.value.moveTo(e.clientX,e.clientY);
-    e.target.addEventListener('mousemove',handleLineMove)
-}
+const handleLineUp = (e) => {
+  context.value.lineTo(e.clientX, e.clientY);
+  context.value.strokeStyle = "green";
+  context.value.lineWidth = 2;
+  context.value.stroke();
+  context.value.closePath();
+  e.target.removeEventListener("mousemove", handleLineMove);
+};
 
+const showPaint = (e) => {
+  context?.value?.beginPath();
+  context.value.moveTo(e.clientX, e.clientY);
+  e.target.addEventListener("mousemove", handleLineMove);
+};
 
-const showInput = (e)=>{
-    if(isSelectWords){
-        return;
-    }
-    if(isFocus){
-        storeText();
-    }
-    const {clientX,clientY}=e;
-    handleInput(clientX,clientY)
-}
+const showInput = (e) => {
+  if (isSelectWords) {
+    return;
+  }
+  if (isFocus) {
+    storeText();
+  }
+  const { clientX, clientY } = e;
+  handleInput(clientX, clientY);
+};
 
-const handleInput = (x,y)=>{
-    Input.value.focus();
-    isFocus = true;
-    Input.value.style=
-            `top:${y}px;
-            left:${x}px;`
-    posX.value=x;
-    posY.value=y;
-}
+const handleInput = (x, y) => {
+  Input.value.focus();
+  isFocus = true;
+  Input.value.style = `top:${y}px;
+            left:${x}px;`;
+  posX.value = x;
+  posY.value = y;
+};
 
-const handleWordsDown = (e)=>{
-    if(isSelect.value.index!==1){
-        e.target.removeEventListener('mousedown',handleWordsDown);
-        return;
-    }
-    isSelectWords = true;
-    Input.value.blur();
-    posX.value = e.offsetX;
-    posY.value = e.offsetY;
-    e.target.addEventListener('mousemove',handleWordsMove);
-}
+const handleWordsDown = (e) => {
+  if (isSelect.value.index !== 1) {
+    e.target.removeEventListener("mousedown", handleWordsDown);
+    return;
+  }
+  isSelectWords = true;
+  Input.value.blur();
+  posX.value = e.offsetX;
+  posY.value = e.offsetY;
+  e.target.addEventListener("mousemove", handleWordsMove);
+};
 
-const handleWordsMove = (e)=>{
-    e.target.style.top= `${e.clientY-posY.value}px`
-    e.target.style.left=`${e.clientX-posX.value}px`
-    Input.value.blur();
-    e.target.addEventListener('mouseup',removeWordsMove);
-}
+const handleWordsMove = (e) => {
+  e.target.style.top = `${e.clientY - posY.value}px`;
+  e.target.style.left = `${e.clientX - posX.value}px`;
+  Input.value.blur();
+  e.target.addEventListener("mouseup", removeWordsMove);
+};
 
-const removeWordsMove = (e)=>{
-    isSelectWords = false;
-    e.target.removeEventListener('mousemove',handleWordsMove);
-}
+const removeWordsMove = (e) => {
+  isSelectWords = false;
+  e.target.removeEventListener("mousemove", handleWordsMove);
+};
 
-const storeText = ()=>{
-    const label1 = document.createElement('label');
-    label1.addEventListener('click',editInput)
-    label1.addEventListener('mousedown',handleWordsDown);
-    label1.style=`
+const storeText = () => {
+  const label1 = document.createElement("label");
+  label1.addEventListener("click", editInput);
+  label1.addEventListener("mousedown", handleWordsDown);
+  label1.style = `
         position:absolute;
         top:${posY.value}px;
         left:${posX.value}px;
         font-size:12px;
-    `
-    label1.innerText=Input.value.value;
-    Input.value.value="";
-    Input.value.blur();
-    isFocus=false;
-    wordsContainer.value.appendChild(label1);
-}
+    `;
+  label1.innerText = Input.value.value;
+  Input.value.value = "";
+  Input.value.blur();
+  isFocus = false;
+  wordsContainer.value.appendChild(label1);
+};
 
-const deleteLabel = (e)=>{
-    e.target.remove();
-}
+const deleteLabel = (e) => {
+  e.target.remove();
+};
 
-const editInput = (e)=>{
-    if(isSelect.value.bool&&isSelect.value.index===5){
-        deleteLabel(e);
-        return;
-    }
-    else if(!isSelect.value.bool||isSelect.value.index!==2||isSelectWords){
-        return;
-    }
-
-    if(isFocus){
-        storeText();
-    }
-    const inputValue = e.target.innerText;
+const editInput = (e) => {
+  if (isSelect.value.bool && isSelect.value.index === 5) {
     deleteLabel(e);
-    handleInput(parseInt(e.target.style.left),parseInt(e.target.style.top));
-    Input.value.value = inputValue;
-}
+    return;
+  } else if (
+    !isSelect.value.bool ||
+    isSelect.value.index !== 2 ||
+    isSelectWords
+  ) {
+    return;
+  }
 
-onMounted(()=>{
-    context.value = canvas.value.getContext('2d')
-    canvas.value.width = document.body.clientWidth;
-    canvas.value.height = document.body.clientHeight;
-    // console.log("context.value.width",context.value)
-    devicePixelRatio.value = window.devicePixelRatio;
-    canvas.value.width *= devicePixelRatio.value;
-    canvas.value.height *= devicePixelRatio.value;
+  if (isFocus) {
+    storeText();
+  }
+  const inputValue = e.target.innerText;
+  deleteLabel(e);
+  handleInput(parseInt(e.target.style.left), parseInt(e.target.style.top));
+  Input.value.value = inputValue;
+};
 
-    context.value.font = 12*devicePixelRatio.value+'px 微软雅黑'
-    // makeHighRes(context.value);
-})
+onMounted(() => {
+  context.value = canvas.value.getContext("2d");
+  canvas.value.width = document.body.clientWidth;
+  canvas.value.height = document.body.clientHeight;
+  // console.log("context.value.width",context.value)
+  devicePixelRatio.value = window.devicePixelRatio;
+  canvas.value.width *= devicePixelRatio.value;
+  canvas.value.height *= devicePixelRatio.value;
 
+  context.value.font = 12 * devicePixelRatio.value + "px 微软雅黑";
+  // makeHighRes(context.value);
+});
 </script>
 
 <style lang="scss" scoped>
-.canvas-container{
-    width: 100vw;
-    height: 100vh;
-    background-color: #eee;
-    overflow: hidden;
-    input{
-        position: absolute;
-        top: 0;
-        left: 0;
-        background: transparent;
-        border: 0;
-        outline: 0;
-    }
+.canvas-container {
+  width: 100vw;
+  height: 100vh;
+  background-color: #eee;
+  input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+  }
 }
 </style>

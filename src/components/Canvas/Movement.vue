@@ -1,26 +1,39 @@
 <template>
-  <div class="movement-container">
-    <span>移动</span>
-    <i>
-      <img src="@/assets/images/menu/移动.svg" />
-    </i>
-  </div>
+  <i>
+    <img :src="imgSrc" />
+  </i>
+  <span>移动</span>
 </template>
 
 <script lang="ts" setup>
+import { ref, watch } from "vue";
+const props = defineProps({
+  isSelect: Boolean,
+});
+console.log(props.isSelect);
+const imgSrc = ref(String(require("@/assets/images/menu/移动-black.svg")));
+// if (props.isSelect) {
+//   imgSrc.value = require("@/assets/images/menu/移动.svg");
+// }
+watch(
+  () => props.isSelect,
+  (cur: boolean) => {
+    if (cur) {
+      imgSrc.value = require("@/assets/images/menu/移动.svg");
+    } else {
+      imgSrc.value = require("@/assets/images/menu/移动-black.svg");
+    }
+  },
+  {
+    immediate: true,
+  }
+);
 </script>
 
 <style lang="scss">
 i {
-  display: flex;
-  justify-content: center;
   img {
-    width: 20px;
+    width: 18px;
   }
-}
-.movement-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 </style>

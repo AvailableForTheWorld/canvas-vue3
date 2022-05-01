@@ -1,0 +1,13 @@
+.menu-item {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    i {
+      display: flex;
+      justify-content: center;
+      img {
+        width: 18px;
+        margin-left: 6px;
+      }
+    }
+  }

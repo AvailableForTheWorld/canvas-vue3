@@ -1,6 +1,5 @@
 <template>
-  <div class="menu">
-    <!-- <ul @click="handleClick($event)" ref="menuUl">
+  <!-- <ul @click="handleClick($event)" ref="menuUl">
       <li>
         <el-icon :color="isSelect.index===1?'#fff':''">
           <Rank />
@@ -50,8 +49,7 @@
       </li>
 
     </ul> -->
-    <slot></slot>
-  </div>
+  <slot></slot>
 </template>
 
 <script lang="ts" setup>
@@ -144,34 +142,34 @@ const exitFullscreen = () => {
 };
 </script>
 <style lang="scss" scoped>
-.menu {
-  ul {
-    background-color: #f5f5f5;
-    display: flex;
-    max-width: 1200px;
-    margin: 0 auto;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: 25px;
-    box-shadow: 0 0 6px #c7c7c7;
-    li {
-      width: 50px;
-      height: 50px;
-      text-align: center;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      i {
-        display: block;
-        background-color: transparent;
-        padding: 7px;
-        border-radius: 50%;
-      }
-    }
-  }
-}
+// .menu {
+//   ul {
+//     background-color: #f5f5f5;
+//     display: flex;
+//     max-width: 1200px;
+//     margin: 0 auto;
+//     justify-content: center;
+//     align-items: center;
+//     position: fixed;
+//     top: 30px;
+//     left: 50%;
+//     transform: translateX(-50%);
+//     border-radius: 25px;
+//     box-shadow: 0 0 6px #c7c7c7;
+//     li {
+//       width: 50px;
+//       height: 50px;
+//       text-align: center;
+//       display: flex;
+//       justify-content: center;
+//       align-items: center;
+//       i {
+//         display: block;
+//         background-color: transparent;
+//         padding: 7px;
+//         border-radius: 50%;
+//       }
+//     }
+//   }
+// }
 </style>
