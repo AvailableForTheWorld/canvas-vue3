@@ -3,16 +3,16 @@
 </template>
 
 <script lang="ts" setup>
-import Painting from './views/Painting.vue'
+import Painting from "./views/Painting.vue";
 </script>
 
-<style lang="scss" >
-*{
+<style lang="scss" scoped >
+* {
   padding: 0;
   margin: 0;
 }
-ul{
-  li{
+ul {
+  li {
     list-style: none;
   }
 }
